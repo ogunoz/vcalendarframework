@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="european">2</integer>
+    <integer name="american">1</integer>
+    <integer name="english">10</integer>
+    <integer name="german">11</integer>
+    <integer name="french">12</integer>
+    <integer name="italian">13</integer>
+    <integer name="russian">14</integer>
+    <integer name="turkish">15</integer>
+
+
+</resources>

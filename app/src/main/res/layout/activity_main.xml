@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    tools:context="ogunoz.com.vcalendarframework.MainActivity">
+
+    <ogunoz.com.vcalendar.CalendarLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:calendarLanguage="english"
+        app:calendarType="european"
+        app:daySelectionColor="#9f214d"
+        app:dayUnreadIcon="@drawable/star"
+        app:disableEventList="false"
+        app:disableHolidaysAndWeekends="true"
+        app:endMonth="Feb"
+        app:endYear="2017"
+        app:eventListDividerColor="@color/white"
+        app:eventListDividerHeight="3dp"
+        app:extraLayout="@layout/week_layout_content"
+        app:startMonth="Mar"
+        app:startYear="2016" />
+
+</LinearLayout>

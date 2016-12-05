@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="black">#ff000000</color>
+    <color name="gray">#c8c8c8</color>
+    <color name="white">#ffffffff</color>
+    <color name="transparent">#00ffffff</color>
+    <color name="button_color">#3567cc</color>
+    <color name="day_selection_color">#5151e9</color>
+</resources>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CalendarLayout">
+        <attr name="startMonth" format="string" />
+        <attr name="startYear" format="integer" />
+        <attr name="endMonth" format="string" />
+        <attr name="endYear" format="integer" />
+        <attr name="calendarType" format="enum">
+            <enum name="european" value="2" />
+            <enum name="american" value="1" />
+        </attr>
+        <attr name="calendarLanguage" format="enum">
+            <enum name="english" value="10" />
+            <enum name="german" value="11" />
+            <enum name="french" value="12" />
+            <enum name="italian" value="13" />
+            <enum name="russian" value="14" />
+            <enum name="turkish" value="15" />
+        </attr>
+        <attr name="disableHolidaysAndWeekends" format="boolean" />
+        <attr name="extraLayout" format="reference" />
+        <attr name="disableEventList" format="boolean"/>
+
+        <attr name="eventListDividerColor" format="color"/>
+        <attr name="eventListDividerHeight" format="dimension"/>
+        <attr name="daySelectionColor" format="color"/>
+        <attr name="dayUnreadIcon" format="reference"/>
+        <attr name="rememberLastSelectedDay" format="boolean"/>
+
+    </declare-styleable>
+</resources>

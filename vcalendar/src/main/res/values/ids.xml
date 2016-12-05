@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="day_button_id" type="id"/>
+    <item name="event_layout_id" type="id"/>
+    <item name="selection_id" type="id"/>
+    <item name="selection_arrow_id" type="id"/>
+    <item name="day_layout_id" type="id"/>
+    <item name="unread_image_id" type="id"/>
+</resources>
