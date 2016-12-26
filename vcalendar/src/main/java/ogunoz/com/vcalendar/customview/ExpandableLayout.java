@@ -1,9 +1,12 @@
 package ogunoz.com.vcalendar.customview;
 
+import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.animation.DecelerateInterpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.LinearLayout;
 
 /**

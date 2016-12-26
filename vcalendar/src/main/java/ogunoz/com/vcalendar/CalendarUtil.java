@@ -1,4 +1,4 @@
-package ogunoz.com.vcalendar.util;
+package ogunoz.com.vcalendar;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -18,12 +18,11 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
 
-import ogunoz.com.vcalendar.DayListener;
-import ogunoz.com.vcalendar.R;
 import ogunoz.com.vcalendar.adapters.EventAdapter;
 import ogunoz.com.vcalendar.adapters.MonthPagerAdapter;
 import ogunoz.com.vcalendar.models.Event;
 import ogunoz.com.vcalendar.models.Month;
+import ogunoz.com.vcalendar.util.DateUtil;
 
 
 /**
@@ -53,6 +52,9 @@ public class CalendarUtil {
 
     private static DayListener dayListener;
     private static Drawable dayUnreadIcon;
+
+    private static int lastClickedDayIndex = -1;
+    private static int lastClickedMonthPosition = -1;
 
     public static void init(String startDate, String endDate) {
         monthNames = new ArrayList<>();
@@ -328,6 +330,22 @@ public class CalendarUtil {
 
     public static void setDayUnreadIcon(Drawable dayUnreadIcon) {
         CalendarUtil.dayUnreadIcon = dayUnreadIcon;
+    }
+
+    public static int getLastClickedMonthPosition() {
+        return lastClickedMonthPosition;
+    }
+
+    public static void setLastClickedMonthPosition(int lastClickedMonthPosition) {
+        CalendarUtil.lastClickedMonthPosition = lastClickedMonthPosition;
+    }
+
+    public static int getLastClickedDayIndex() {
+        return lastClickedDayIndex;
+    }
+
+    public static void setLastClickedDayIndex(int lastClickedDayIndex) {
+        CalendarUtil.lastClickedDayIndex = lastClickedDayIndex;
     }
 
     private static void addEvent(Event event, int year, int month, int day) {

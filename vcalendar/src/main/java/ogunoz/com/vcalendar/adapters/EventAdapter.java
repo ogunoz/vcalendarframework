@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 import ogunoz.com.vcalendar.R;
 import ogunoz.com.vcalendar.models.Event;
-import ogunoz.com.vcalendar.util.CalendarUtil;
+import ogunoz.com.vcalendar.CalendarUtil;
 
 /**
  * Created by Ogün Öz on 25/08/16.

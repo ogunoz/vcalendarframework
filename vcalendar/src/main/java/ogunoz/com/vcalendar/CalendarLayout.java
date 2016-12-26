@@ -16,7 +16,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.text.ParseException;
@@ -25,17 +24,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import ogunoz.com.vcalendar.adapters.EventAdapter;
 import ogunoz.com.vcalendar.adapters.HeaderPagerAdapter;
 import ogunoz.com.vcalendar.adapters.MonthPagerAdapter;
 import ogunoz.com.vcalendar.customview.DraggableListView;
-import ogunoz.com.vcalendar.customview.ExpandableLayout;
-import ogunoz.com.vcalendar.models.Day;
 import ogunoz.com.vcalendar.models.Event;
 import ogunoz.com.vcalendar.models.Month;
-import ogunoz.com.vcalendar.util.CalendarUtil;
 
 
 /**
@@ -207,7 +202,8 @@ public class CalendarLayout extends LinearLayout implements MonthPagerAdapter.Mo
 
         final HeaderPagerAdapter headerPagerAdapter = new HeaderPagerAdapter(context, CalendarUtil.getMonthNames(), calendarPager);
         monthNamePager.setAdapter(headerPagerAdapter);
-        final MonthPagerAdapter monthPagerAdapter = new MonthPagerAdapter(context, CalendarUtil.getMonthList(), dayExpandable, this);
+        final MonthPagerAdapter monthPagerAdapter = new MonthPagerAdapter(context, CalendarUtil.getMonthList(), dayExpandable,
+                this, calendarPager);
         calendarPager.setAdapter(monthPagerAdapter);
         CalendarUtil.setMonthPagerAdapter(monthPagerAdapter);
 
@@ -241,35 +237,13 @@ public class CalendarLayout extends LinearLayout implements MonthPagerAdapter.Mo
                     CalendarUtil.setNeighborViewUnSelected(monthNamePager, previousPosition);
                     CalendarUtil.setCurrentViewSelected(monthNamePager, position);
                     setYearText(yearText, position, previousPosition);
+                    selectDay(rememberLastSelectedDay, position, monthPagerAdapter);
                     previousPosition = position;
 
-                } else {
-
-                    if (!rememberLastSelectedDay) {
-                        events.clear();
-                        CalendarUtil.setSelectedDayEventList(null);
-                        eventAdapter.notifyDataSetChanged();
-
-
-                        View view = calendarPager.findViewWithTag(position + "");
-
-                        Month month = CalendarUtil.getMonthList().get(position);
-
-                        if(month.getToday() > 0){
-                            monthPagerAdapter.clickDayLayout(monthPagerAdapter.getDayLayout(view, month.getToday(), month),
-                                    events, 0, month.getToday(), month);
-                        }
-                        else{
-                            monthPagerAdapter.clickDayLayout(monthPagerAdapter.getDayLayout(view, 1, month), events, 0, 1, month);
-                        }
-
-                        CalendarUtil.setCalendarPagerHeight(calendarPager, ViewGroup.LayoutParams.MATCH_PARENT);
-                    } else {
-                        // TODO do nothing
-                    }
                 }
-
-
+                //else {
+                 //   selectDay(rememberLastSelectedDay, position, monthPagerAdapter);
+               // }
             }
 
             @Override
@@ -284,8 +258,9 @@ public class CalendarLayout extends LinearLayout implements MonthPagerAdapter.Mo
             }
         };
 
-        calendarPager.addOnPageChangeListener(listener);
         calendarPager.setCurrentItem(CalendarUtil.getCurrentMonthIndex(), false);
+        calendarPager.addOnPageChangeListener(listener);
+
         String year = calendar.get(Calendar.YEAR) + "";
         yearText.setText(year);
 
@@ -313,36 +288,12 @@ public class CalendarLayout extends LinearLayout implements MonthPagerAdapter.Mo
                     setYearText(yearText, position, previousPosition);
                     CalendarUtil.setNeighborViewUnSelected(monthNamePager, previousPosition);
                     CalendarUtil.setCurrentViewSelected(monthNamePager, position);
+                    selectDay(rememberLastSelectedDay, position, monthPagerAdapter);
                     previousPosition = position;
-                } else {
-                    if (!rememberLastSelectedDay) {
-                        events.clear();
-
-                        Month month = CalendarUtil.getMonthList().get(position);
-                        events = CalendarUtil.getMonthMap().get(month.getYear()).get(month.getMonthIndex()).getDay(0).getEventList();
-                        CalendarUtil.setSelectedDayEventList(events);
-
-
-
-                        eventAdapter.notifyDataSetChanged();
-
-                        View view = calendarPager.findViewWithTag(position + "");
-
-
-
-                        if(month.getToday() > 0){
-                            monthPagerAdapter.clickDayLayout(monthPagerAdapter.getDayLayout(view, month.getToday(), month),
-                                    events, 0, month.getToday(), month);
-                        }
-                        else{
-                            monthPagerAdapter.clickDayLayout(monthPagerAdapter.getDayLayout(view, 1, month), events, 0, 1, month);
-                        }
-
-                        CalendarUtil.setCalendarPagerHeight(calendarPager, ViewGroup.LayoutParams.MATCH_PARENT);
-                    } else {
-                        // TODO do nothing
-                    }
                 }
+                //else {
+                //    selectDay(rememberLastSelectedDay, position, monthPagerAdapter);
+               // }
 
             }
 
@@ -367,20 +318,26 @@ public class CalendarLayout extends LinearLayout implements MonthPagerAdapter.Mo
 
     @Override
     public void onDayClick(int extraHeight, int day, int monthIndex, int year) {
-        ArrayList<Event> eventList = CalendarUtil.getMonthMap().get(year).get(monthIndex).getEventMap().
-                get(day).getEventList();
+        ArrayList<Event> eventList;
+        if (day >= 0) {
+            eventList = CalendarUtil.getMonthMap().get(year).get(monthIndex).getEventMap().
+                    get(day).getEventList();
+        } else {
+            eventList = null;
+        }
+
         int eventNumber = 0;
         if (eventList != null) {
             eventNumber = eventList.size();
         }
-        if (eventNumber > 0 && !disableEventList) {
-            CalendarUtil.setCalendarPagerHeight(calendarPager, ViewGroup.LayoutParams.WRAP_CONTENT);
-            calendarPager.getLayoutParams().height = calendarPager.getLayoutParams().height + extraHeight;
-        } else {
-            CalendarUtil.setCalendarPagerHeight(calendarPager, ViewGroup.LayoutParams.MATCH_PARENT);
-        }
+        //  if (eventNumber > 0 && !disableEventList) {
+        //  CalendarUtil.setCalendarPagerHeight(calendarPager, ViewGroup.LayoutParams.WRAP_CONTENT);
+        //  calendarPager.getLayoutParams().height = calendarPager.getLayoutParams().height + extraHeight;
+        //  } else {
+        //   CalendarUtil.setCalendarPagerHeight(calendarPager, ViewGroup.LayoutParams.MATCH_PARENT);
+        //  }
         events.clear();
-        for (int i = 0; i < eventList.size(); i++) {
+        for (int i = 0; i < eventNumber; i++) {
             Event e = eventList.get(i);
             events.add(e);
         }
@@ -445,6 +402,32 @@ public class CalendarLayout extends LinearLayout implements MonthPagerAdapter.Mo
             yearText.setText(year);
             blinkYear(yearText);
         }
+    }
+
+    private void selectDay(boolean remembering, int position, MonthPagerAdapter monthPagerAdapter) {
+        Month month = CalendarUtil.getMonthList().get(position);
+
+        View view = calendarPager.findViewWithTag(position + "");
+        ArrayList<Event> eventArrayList;
+
+        int targetDay = 1;
+        if (month.getToday() > 0) {
+            targetDay = month.getToday();
+        }
+        if (remembering) {
+            targetDay = -10;
+            if (position == CalendarUtil.getLastClickedMonthPosition()) {
+                targetDay = CalendarUtil.getLastClickedDayIndex();
+            }
+        }
+
+        if (targetDay > 0) {
+            eventArrayList = CalendarUtil.getMonthMap().get(month.getYear()).
+                    get(month.getMonthIndex()).getDay(targetDay - 1).getEventList();
+        } else {
+            eventArrayList = new ArrayList<>();
+        }
+        monthPagerAdapter.onDayClick(view, eventArrayList, targetDay, month);
     }
 
 }

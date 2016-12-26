@@ -24,6 +24,7 @@
         app:eventListDividerColor="@color/white"
         app:eventListDividerHeight="3dp"
         app:extraLayout="@layout/week_layout_content"
+        app:rememberLastSelectedDay="false"
         app:startMonth="Mar"
         app:startYear="2016" />
 

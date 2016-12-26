@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import ogunoz.com.vcalendar.DayListener;
 import ogunoz.com.vcalendar.models.Event;
 import ogunoz.com.vcalendar.models.HolidayEvent;
-import ogunoz.com.vcalendar.util.CalendarUtil;
+import ogunoz.com.vcalendar.CalendarUtil;
 
 public class MainActivity extends AppCompatActivity implements DayListener {
 
