@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 import ogunoz.com.vcalendar.R;
 import ogunoz.com.vcalendar.models.Event;
-import ogunoz.com.vcalendar.CalendarUtil;
+import ogunoz.com.vcalendar.util.CalendarLogic;
 
 /**
  * Created by Ogün Öz on 25/08/16.
@@ -31,8 +31,9 @@ public class EventAdapter extends BaseAdapter {
 
     public EventAdapter(Context context) {
         this.context = context;
-        if (CalendarUtil.getSelectedDayEventList() != null) {
-            events = CalendarUtil.getSelectedDayEventList();
+        CalendarLogic calendarLogic = CalendarLogic.getCalendarLogicInstance();
+        if (calendarLogic.getSelectedDayEventList() != null) {
+            events = calendarLogic.getSelectedDayEventList();
         } else {
             events = new ArrayList<>();
         }

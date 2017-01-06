@@ -11,7 +11,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import ogunoz.com.vcalendar.R;
-import ogunoz.com.vcalendar.CalendarUtil;
+import ogunoz.com.vcalendar.util.CalendarLogic;
 
 public class HeaderPagerAdapter extends PagerAdapter {
 
@@ -35,7 +35,8 @@ public class HeaderPagerAdapter extends PagerAdapter {
         final String monthName = monthList.get(position);
         monthNameTextView.setText(monthName);
 
-        if (CalendarUtil.getCurrentMonthIndex() == position) {
+        CalendarLogic calendarLogic = CalendarLogic.getCalendarLogicInstance();
+        if (calendarLogic.getCurrentMonthIndex() == position) {
             if (calendarPager.getCurrentItem() == position) {
                 monthNameTextView.setTextSize(32);
                 monthNameTextView.setAlpha(1.0f);
@@ -43,6 +44,10 @@ public class HeaderPagerAdapter extends PagerAdapter {
                 monthNameTextView.setTextSize(14);
                 monthNameTextView.setAlpha(0.5f);
             }
+        }
+        else{
+            monthNameTextView.setTextSize(14);
+            monthNameTextView.setAlpha(0.5f);
         }
         container.addView(v);
         return v;

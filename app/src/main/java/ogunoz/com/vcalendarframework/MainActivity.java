@@ -7,11 +7,12 @@ import android.support.v7.app.AppCompatActivity;
 import java.util.ArrayList;
 
 import ogunoz.com.vcalendar.DayListener;
+import ogunoz.com.vcalendar.MonthListener;
+import ogunoz.com.vcalendar.VCalendar;
 import ogunoz.com.vcalendar.models.Event;
 import ogunoz.com.vcalendar.models.HolidayEvent;
-import ogunoz.com.vcalendar.CalendarUtil;
 
-public class MainActivity extends AppCompatActivity implements DayListener {
+public class MainActivity extends AppCompatActivity implements DayListener, MonthListener {
 
 
     @Override
@@ -19,7 +20,7 @@ public class MainActivity extends AppCompatActivity implements DayListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        CalendarUtil.setDayListener(this);
+        VCalendar.setDayListener(this);
 
         Event e1 = new Event("XXXXX", "Nullam quis risus eget urna mollis ornare vel eu leo.", Color.RED,
                 "23-Jan-2016 16:40", "23-Jan-2016 19:20");
@@ -28,27 +29,32 @@ public class MainActivity extends AppCompatActivity implements DayListener {
         ArrayList<Event> sampleEventList = new ArrayList<>();
         sampleEventList.add(e1);
         sampleEventList.add(e2);
-        CalendarUtil.addEvents("14-Dec-2016", sampleEventList);
-        CalendarUtil.addEvent("01-Nov", new Event("Title", "Content"));
+        VCalendar.addEvents("14-Dec-2016", sampleEventList);
+        VCalendar.addEvent("01-Nov", new Event("Title", "Content"));
 
-        CalendarUtil.addEvent("01-Jan", new HolidayEvent("New Year", "Happy New Year"));
-        CalendarUtil.addEvent("09-May", new HolidayEvent("Victory Day", "Victory Day for The Red Army"));
-        CalendarUtil.addEvent("05-Jul-2016", new HolidayEvent("Feast", "Ramadan"));
-        CalendarUtil.addEvent("06-Jul-2016", new HolidayEvent("Feast", "Ramadan"));
-        CalendarUtil.addEvent("07-Jul-2016", new HolidayEvent("Feast", "Ramadan"));
+        VCalendar.addEvent("01-Jan", new HolidayEvent("New Year", "Happy New Year"));
+        VCalendar.addEvent("09-May", new HolidayEvent("Victory Day", "Victory Day for The Red Army"));
+        VCalendar.addEvent("05-Jul-2016", new HolidayEvent("Feast", "Ramadan"));
+        VCalendar.addEvent("06-Jul-2016", new HolidayEvent("Feast", "Ramadan"));
+        VCalendar.addEvent("07-Jul-2016", new HolidayEvent("Feast", "Ramadan"));
 
-        CalendarUtil.setEventListViewAdapter(new CustomEventAdapter(this));
+        VCalendar.setEventListViewAdapter(new CustomEventAdapter(this));
 
     }
 
 
     @Override
-    public void onDayClick() {
+    public void onDayClick(int day, int month, int year) {
 
     }
 
     @Override
-    public void onDayLongClick() {
+    public void onDayLongClick(int day, int month, int year) {
+
+    }
+
+    @Override
+    public void onMonthSelected(int month, int year) {
 
     }
 }

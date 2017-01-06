@@ -19,13 +19,14 @@
         app:dayUnreadIcon="@drawable/star"
         app:disableEventList="false"
         app:disableHolidaysAndWeekends="true"
-        app:endMonth="Feb"
+        app:endMonth="February"
         app:endYear="2017"
+        app:calendarPageOffset="12"
         app:eventListDividerColor="@color/white"
         app:eventListDividerHeight="3dp"
         app:extraLayout="@layout/week_layout_content"
         app:rememberLastSelectedDay="false"
-        app:startMonth="Mar"
+        app:startMonth="March"
         app:startYear="2016" />
 
 </LinearLayout>

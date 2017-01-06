@@ -54,7 +54,7 @@ public class ExpandableLayout extends LinearLayout {
     }
 
 
-    public void expand() {
+    public void expand(int duration) {
         isExpanded = true;
 
         ValueAnimator valueAnimator = ValueAnimator.ofInt(0, targetHeight);
@@ -66,11 +66,11 @@ public class ExpandableLayout extends LinearLayout {
             }
         });
         valueAnimator.setInterpolator(new DecelerateInterpolator());
-        valueAnimator.setDuration(500);
+        valueAnimator.setDuration(duration);
         valueAnimator.start();
     }
 
-    public void collapse() {
+    public void collapse(int duration) {
         isExpanded = false;
         ValueAnimator valueAnimator = ValueAnimator.ofInt(targetHeight, 0);
         valueAnimator.setInterpolator(new DecelerateInterpolator());
@@ -82,7 +82,7 @@ public class ExpandableLayout extends LinearLayout {
             }
         });
         valueAnimator.setInterpolator(new DecelerateInterpolator());
-        valueAnimator.setDuration(500);
+        valueAnimator.setDuration(duration);
         valueAnimator.start();
     }
 }

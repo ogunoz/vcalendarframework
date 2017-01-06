@@ -6,6 +6,6 @@ package ogunoz.com.vcalendar;
 
 public interface DayListener {
 
-    void onDayClick();
-    void onDayLongClick();
+    void onDayClick(int day, int month, int year);
+    void onDayLongClick(int day, int month, int year);
 }

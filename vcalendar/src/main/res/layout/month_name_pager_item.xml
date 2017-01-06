@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:gravity="center">
-
 
     <TextView
         android:id="@+id/month_name_text_view"
@@ -14,9 +12,6 @@
         android:alpha="0.5"
         android:layout_centerInParent="true"
         android:gravity="center"
-        android:text="sastsaa"
         android:textColor="@color/black"
         android:textSize="14dp" />
-
-
 </RelativeLayout>

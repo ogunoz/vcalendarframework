@@ -1,7 +1,5 @@
 package ogunoz.com.vcalendar.adapters;
 
-import android.animation.Animator;
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -10,31 +8,29 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
+import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.ScaleAnimation;
-import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import ogunoz.com.vcalendar.DayListener;
 import ogunoz.com.vcalendar.R;
+import ogunoz.com.vcalendar.VCalendar;
 import ogunoz.com.vcalendar.customview.ExpandableLayout;
 import ogunoz.com.vcalendar.customview.MinHeightButton;
 import ogunoz.com.vcalendar.models.Day;
 import ogunoz.com.vcalendar.models.Event;
 import ogunoz.com.vcalendar.models.HolidayEvent;
 import ogunoz.com.vcalendar.models.Month;
-import ogunoz.com.vcalendar.CalendarUtil;
+import ogunoz.com.vcalendar.util.CalendarLogic;
+import ogunoz.com.vcalendar.util.CalendarView;
 import ogunoz.com.vcalendar.util.DeviceScreenUtil;
 import ogunoz.com.vcalendar.util.DifferentColorCircularBorder;
 
@@ -43,7 +39,6 @@ public class MonthPagerAdapter extends PagerAdapter {
     private Context context;
     private ArrayList<Month> monthList;
     private MonthPagerAdapterListener listener;
-    private DayListener dayListener;
     private RelativeLayout previousDayLayout;
     private ExpandableLayout previousWeekLayout;
     private LinearLayout previousEventLayout;
@@ -51,22 +46,21 @@ public class MonthPagerAdapter extends PagerAdapter {
     private boolean dayExpandable;
     private int extraContentColor;
     private boolean isTodaySelected = false;
-    private ViewPager calendarPager;
-    private int maximumHeight = 0;
     private int extraContentHeight = 0;
+    private SparseArray<SparseArray<Month>> monthMap;
 
 
     public MonthPagerAdapter(Context context, ArrayList<Month> monthList, boolean dayExpandable,
-                             MonthPagerAdapterListener listener, ViewPager calendarPager) {
+                             MonthPagerAdapterListener listener, SparseArray<SparseArray<Month>> monthMap) {
         this.context = context;
         this.monthList = monthList;
         this.dayExpandable = dayExpandable;
         this.listener = listener;
-        this.dayListener = CalendarUtil.getDayListener();
         border = new DifferentColorCircularBorder(context);
-        this.calendarPager = calendarPager;
+        this.monthMap = monthMap;
 
-        View extraContentView = View.inflate(context, CalendarUtil.getExtraViewID(), null);
+        CalendarView calendarView = CalendarView.getCalendarViewInstance();
+        View extraContentView = View.inflate(context, calendarView.getExtraViewID(), null);
         extraContentView.measure(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         extraContentHeight = extraContentView.getMeasuredHeight();
 
@@ -78,20 +72,20 @@ public class MonthPagerAdapter extends PagerAdapter {
         extraContentColor = color;
     }
 
+
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         LayoutInflater inflater = LayoutInflater.from(this.context);
-        View v = inflater.inflate(R.layout.calendar_pager_item, container, false);
+        final View v = inflater.inflate(R.layout.calendar_pager_item, container, false);
         v.setTag(position + "");
         LinearLayout calendarLayout = (LinearLayout) v.findViewById(R.id.calendar_layout);
         calendarLayout.setTag("CalendarLayout");
         createCalendar(calendarLayout, position);
 
         v.measure(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        if (v.getMeasuredHeight() > maximumHeight) {
-            maximumHeight = v.getMeasuredHeight();
-            calendarPager.getLayoutParams().height = maximumHeight;
-        }
+
+        CalendarView calendarView = CalendarView.getCalendarViewInstance();
+        calendarView.getCalendarHeightList().put(position, v.getMeasuredHeight());
 
         container.addView(v);
 
@@ -114,12 +108,14 @@ public class MonthPagerAdapter extends PagerAdapter {
         return view == object;
     }
 
-    private void createCalendar(LinearLayout calendarLayout, final int position) {
+    private void createCalendar(final LinearLayout calendarLayout, final int position) {
         final Month month = monthList.get(position);
+        final CalendarLogic calendarLogic = CalendarLogic.getCalendarLogicInstance();
+        final CalendarView calendarView = CalendarView.getCalendarViewInstance();
 
         int i = 0;
         while (7 * i + 1 - month.getFirstDayOfMonth() <= month.getLastDayOfMonth()) {
-            View extraContentView = View.inflate(context, CalendarUtil.getExtraViewID(), null);
+            final View extraContentView = View.inflate(context, calendarView.getExtraViewID(), null);
 
             final LinearLayout weekContentLayout = ((LinearLayout) extraContentView);
             weekContentLayout.setTag("WeekLayoutContent " + i);
@@ -137,20 +133,22 @@ public class MonthPagerAdapter extends PagerAdapter {
                 final int day = 7 * i + j + 1 - month.getFirstDayOfMonth();
                 final RelativeLayout dayLayout = new RelativeLayout(context);
                 dayLayout.setTag("DayLayout " + day);
+
                 final LinearLayout eventLayout = new LinearLayout(context);
 
                 final ImageView unreadView = new ImageView(context);
                 unreadView.setId(R.id.unread_image_id);
 
-                Drawable unreadIcon = CalendarUtil.getDayUnreadIcon();
+                Drawable unreadIcon = calendarView.getDayUnreadIcon();
                 if (unreadIcon != null) {
                     unreadView.setImageDrawable(unreadIcon);
-                    int unreadIconSize = DeviceScreenUtil.dpToPx(context, 10);
+                    int unreadIconSize = DeviceScreenUtil.dpToPx(context, 12);
                     RelativeLayout.LayoutParams unreadIconParam = new RelativeLayout.LayoutParams(unreadIconSize, unreadIconSize);
                     unreadView.setLayoutParams(unreadIconParam);
                     unreadIconParam.addRule(RelativeLayout.ALIGN_PARENT_TOP);
                     unreadIconParam.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                    unreadIconParam.setMargins(0, unreadIconSize / 2, 0, 0);
+
+                    //  unreadIconParam.setMargins(0, unreadIconSize / 3, 0, 0);
                 }
                 unreadView.setVisibility(View.GONE);
                 dayLayout.addView(unreadView);
@@ -167,7 +165,7 @@ public class MonthPagerAdapter extends PagerAdapter {
                         unreadView.setVisibility(View.VISIBLE);
                     }
 
-                    Day dayObject = CalendarUtil.getMonthMap().get(month.getYear()).
+                    Day dayObject = monthMap.get(month.getYear()).
                             get(month.getMonthIndex()).getEventMap().get(day - 1);
                     eventList = dayObject.getEventList();
                     if (eventList != null) {
@@ -193,26 +191,29 @@ public class MonthPagerAdapter extends PagerAdapter {
 
                     RelativeLayout.LayoutParams eventsLayoutParam = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT);
-                    // eventsLayoutParam.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.day_button_id);
-                    eventsLayoutParam.addRule(RelativeLayout.CENTER_IN_PARENT);
+                    eventsLayoutParam.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.day_button_id);
+                    eventsLayoutParam.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                    // eventsLayoutParam.addRule(RelativeLayout.CENTER_IN_PARENT);
                     eventLayout.setLayoutParams(eventsLayoutParam);
-                    int a = DeviceScreenUtil.dpToPx(context, 14);
-                    eventLayout.setPadding(0, 2 * a, 0, 0);
+                    int a = DeviceScreenUtil.dpToPx(context, 5);
+                    eventLayout.setPadding(0, 0, 0, a);
 
                     RelativeLayout.LayoutParams dayButtonParam = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT);
+                    dayButtonParam.addRule(RelativeLayout.CENTER_IN_PARENT);
                     dayButton.setLayoutParams(dayButtonParam);
                     dayButton.setGravity(Gravity.CENTER);
 
+
                     dayButton.measure(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                     int heightButton = dayButton.getMeasuredHeight();
-                    int weightButton = dayButton.getMeasuredWidth();
+                    int widthButton = dayButton.getMeasuredWidth();
 
-                    final int min = heightButton < weightButton ? heightButton : weightButton;
+                    final int min = heightButton < widthButton ? heightButton : widthButton;
                     ImageView selectionView = new ImageView(context);
                     selectionView.setId(R.id.selection_id);
                     selectionView.setImageResource(R.drawable.today_button_selector);
-                    selectionView.setColorFilter(CalendarUtil.getDaySelectionColor(), PorterDuff.Mode.SRC);
+                    selectionView.setColorFilter(calendarView.getDaySelectionColor(), PorterDuff.Mode.SRC);
 
                     RelativeLayout.LayoutParams selectionViewParams = new RelativeLayout.LayoutParams(min * 2 / 3, min * 2 / 3);
                     selectionView.setLayoutParams(selectionViewParams);
@@ -222,6 +223,8 @@ public class MonthPagerAdapter extends PagerAdapter {
 
                     if (day == month.getToday()) {
                         dayButton.setTypeface(null, Typeface.BOLD);
+                    } else {
+                        dayButton.setTypeface(null, Typeface.NORMAL);
                     }
 
 
@@ -229,8 +232,8 @@ public class MonthPagerAdapter extends PagerAdapter {
                     dayButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            CalendarUtil.setLastClickedMonthPosition(position);
-                            CalendarUtil.setLastClickedDayIndex(day);
+                            calendarLogic.setLastClickedMonthPosition(position);
+                            calendarLogic.setLastClickedDayIndex(day);
                             onDayClick(dayLayout, finalEventList, day, month);
                         }
                     });
@@ -239,54 +242,31 @@ public class MonthPagerAdapter extends PagerAdapter {
                         dayButton.setOnLongClickListener(new View.OnLongClickListener() {
                             @Override
                             public boolean onLongClick(View v) {
+                                DayListener dayListener = VCalendar.getDayListener();
                                 if (dayListener != null) {
-                                    dayListener.onDayLongClick();
+                                    dayListener.onDayLongClick(day, month.getMonthIndex(), month.getYear());
                                 }
                                 unreadView.setVisibility(View.GONE);
 
-                                boolean previousExpanded = false;
                                 if (previousDayLayout != null && previousDayLayout != dayLayout) {
                                     ImageView previousArrow = (ImageView) previousDayLayout.findViewById(R.id.selection_arrow_id);
                                     previousDayLayout.removeView(previousArrow);
                                 }
                                 if (previousWeekLayout != null && previousWeekLayout != weekLayout && previousWeekLayout.isExpanded()) {
-                                    previousWeekLayout.collapse();
-                                    previousExpanded = true;
+                                    previousWeekLayout.collapse(context.getResources().getInteger(R.integer.animationDuration));
                                 }
-                                int extraHeight = 0;
-                                if (!previousExpanded) {
-                                    extraHeight = extraContentHeight;
-                                }
+
                                 if (!weekLayout.isExpanded()) {
-                                    weekLayout.expand();
-/*
-                                    int initial = calendarPager.getLayoutParams().height;
-                                    int target = initial + extraHeight;
-
-                                    ValueAnimator va = ValueAnimator.ofFloat(initial, target);
-                                    va.setDuration(400);
-                                    va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                                        public void onAnimationUpdate(ValueAnimator animation) {
-                                            System.out.println((float) animation.getAnimatedValue());
-                                         //   calendarPager.getLayoutParams().height = (int) animation.getAnimatedValue();
-                                         //   System.out.println((int) animation.getAnimatedValue());
-                                          //  calendarPager.requestLayout();
-                                        }
-                                    });
-                                    va.setInterpolator(new LinearInterpolator());
-
-                                    va.start();
-*/
-
-
-                                 //   calendarPager.getLayoutParams().height = calendarPager.getLayoutParams().height + extraHeight;
+                                    weekLayout.expand(context.getResources().getInteger(R.integer.animationDuration));
+                                    calendarView.getCalendarHeightList().put(-1, extraContentHeight);
                                 }
+                                clickDayLayout(dayLayout, finalEventList, day, month, false);
+                                ImageView currentSelectionArrow = (ImageView) dayLayout.findViewById(R.id.selection_arrow_id);
+                                if (currentSelectionArrow == null) {
 
-
-                                if (dayLayout != previousDayLayout) {
                                     ImageView selectionArrow = new ImageView(context);
                                     selectionArrow.setId(R.id.selection_arrow_id);
-                                    selectionArrow.setBackgroundResource(R.drawable.arrow_up);
+                                    selectionArrow.setBackgroundResource(R.drawable.arrow_up_week_layout);
                                     selectionArrow.getBackground().setColorFilter(extraContentColor, PorterDuff.Mode.SRC);
 
                                     RelativeLayout.LayoutParams selectionArrowParam = new RelativeLayout.LayoutParams(min / 2, min / 2);
@@ -296,8 +276,6 @@ public class MonthPagerAdapter extends PagerAdapter {
 
                                     dayLayout.addView(selectionArrow);
                                 }
-
-                                clickDayLayout(dayLayout, finalEventList, extraHeight, day, month);
 
                                 previousWeekLayout = weekLayout;
                                 return true;
@@ -312,12 +290,12 @@ public class MonthPagerAdapter extends PagerAdapter {
                 dayButton.setBackgroundResource(0);
                 String dayLabel = day + "";
                 dayButton.setText(dayLabel);
-                dayButton.setTextSize(14);
+                dayButton.setTextSize(13);
 
-                if (CalendarUtil.isDisableHolidaysAndWeekends()) {
+                if (calendarLogic.isDisableHolidaysAndWeekends()) {
                     int weekEndOne = 5;
                     int weekEndTwo = 6;
-                    if (CalendarUtil.getCalendarType() == context.getResources().getInteger(R.integer.american)) {
+                    if (calendarLogic.getCalendarType() == context.getResources().getInteger(R.integer.american)) {
                         weekEndOne = 0;
                     }
                     if (j == weekEndOne || j == weekEndTwo) { // weekends
@@ -350,13 +328,13 @@ public class MonthPagerAdapter extends PagerAdapter {
         }
     }
 
-    public void clickDayLayout(RelativeLayout dayLayout, ArrayList<Event> eventList, int extraHeight,
-                               int day, Month month) {
+    private void clickDayLayout(RelativeLayout dayLayout, ArrayList<Event> eventList,
+                                int day, Month month, boolean onDayClicked) {
         LinearLayout eventLayout = null;
         if (dayLayout != null) {
-
-            if (dayListener != null) {
-                dayListener.onDayClick();
+            DayListener dayListener = VCalendar.getDayListener();
+            if (onDayClicked && dayListener != null) {
+                dayListener.onDayClick(day, month.getMonthIndex(), month.getYear());
             }
 
             ImageView unreadView = (ImageView) dayLayout.findViewById(R.id.unread_image_id);
@@ -390,7 +368,8 @@ public class MonthPagerAdapter extends PagerAdapter {
                             counter++;
                         }
                     }
-                    border.showBorderPortions(counter, dayLayout);
+                    border.showBorderPortions(counter, dayLayout, context.getResources().
+                            getInteger(R.integer.fastAnimationDuration));
                 } else {
                     selectButton(dayLayout);
                 }
@@ -403,7 +382,7 @@ public class MonthPagerAdapter extends PagerAdapter {
         }
 
 
-        listener.onDayClick(extraHeight, day - 1, month.getMonthIndex(), month.getYear());
+        listener.onDayClick(day - 1, month.getMonthIndex(), month.getYear());
         if (eventLayout != null) {
             eventLayout.setVisibility(View.INVISIBLE);
         }
@@ -419,64 +398,29 @@ public class MonthPagerAdapter extends PagerAdapter {
     }
 
     private void onDayClick(RelativeLayout dayLayout, ArrayList<Event> eventList, int day, Month month) {
-
-        int extraHeight = 0;
         if (dayExpandable) {
             if (previousDayLayout != null && previousDayLayout != dayLayout && previousWeekLayout != null &&
                     previousWeekLayout.isExpanded()) {
+                CalendarView calendarView = CalendarView.getCalendarViewInstance();
                 ImageView previousArrow = (ImageView) previousDayLayout.findViewById(R.id.selection_arrow_id);
                 previousDayLayout.removeView(previousArrow);
 
-                previousWeekLayout.collapse();
-
-                extraHeight = extraContentHeight;
-              //  calendarPager.getLayoutParams().height = calendarPager.getLayoutParams().height - extraHeight;
-
+                previousWeekLayout.collapse(context.getResources().getInteger(R.integer.animationDuration));
+                calendarView.getCalendarHeightList().put(-1, 0);
             }
         }
-        clickDayLayout(dayLayout, eventList, -extraHeight, day, month);
+        clickDayLayout(dayLayout, eventList, day, month, true);
     }
 
     public void onDayClick(View view, ArrayList<Event> eventList,
                            int day, Month month) {
-
-        RelativeLayout dayLayout = getDayLayout(view, day, month);
-
-        int extraHeight = 0;
-        if (dayExpandable) {
-            if (previousDayLayout != null && previousDayLayout != dayLayout && previousWeekLayout != null &&
-                    previousWeekLayout.isExpanded()) {
-                ImageView previousArrow = (ImageView) previousDayLayout.findViewById(R.id.selection_arrow_id);
-                previousDayLayout.removeView(previousArrow);
-
-                previousWeekLayout.collapse();
-                extraHeight = extraContentHeight;
-              //  calendarPager.getLayoutParams().height = calendarPager.getLayoutParams().height - extraHeight;
-            }
-        }
-        clickDayLayout(dayLayout, eventList, -extraHeight, day, month);
-
-
-    }
-
-    public RelativeLayout getDayLayout(View view, int day, Month month) {
-        int weekIndex = 0;
-        if (day != 1) {
-            int indexOfDay = month.getFirstDayOfMonth() + day;
-            weekIndex = indexOfDay / 7;
-        }
-        RelativeLayout dayLayout = null;
-        if (day > 0) {
-            LinearLayout calendarLayout = (LinearLayout) view.findViewWithTag("CalendarLayout");
-            ExpandableLayout weekLayout = (ExpandableLayout) calendarLayout.findViewWithTag("WeekLayout " + weekIndex);
-            LinearLayout weekLayoutHeader = (LinearLayout) weekLayout.findViewWithTag("WeekLayoutHeader " + weekIndex);
-            dayLayout = (RelativeLayout) weekLayoutHeader.findViewWithTag("DayLayout " + day);
-        }
-        return dayLayout;
+        CalendarView calendarView = CalendarView.getCalendarViewInstance();
+        RelativeLayout dayLayout = calendarView.getDayLayout(view, day, month);
+        onDayClick(dayLayout, eventList, day, month);
     }
 
     public interface MonthPagerAdapterListener {
-        void onDayClick(int extraHeight, int dayIndex, int monthIndex, int yearIndex);
+        void onDayClick(int dayIndex, int monthIndex, int yearIndex);
     }
 
 }

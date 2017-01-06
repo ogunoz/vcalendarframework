@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="CalendarLayout">
-        <attr name="startMonth" format="string" />
         <attr name="startYear" format="integer" />
-        <attr name="endMonth" format="string" />
         <attr name="endYear" format="integer" />
         <attr name="calendarType" format="enum">
             <enum name="european" value="2" />
@@ -17,15 +15,50 @@
             <enum name="russian" value="14" />
             <enum name="turkish" value="15" />
         </attr>
+
+        <attr name="startMonth" format="enum">
+            <enum name="January" value="100" />
+            <enum name="February" value="101" />
+            <enum name="March" value="102" />
+            <enum name="April" value="103" />
+            <enum name="May" value="104" />
+            <enum name="June" value="105" />
+            <enum name="July" value="106" />
+            <enum name="August" value="107" />
+            <enum name="September" value="108" />
+            <enum name="October" value="109" />
+            <enum name="November" value="110" />
+            <enum name="December" value="111" />
+        </attr>
+
+        <attr name="endMonth" format="enum">
+            <enum name="January" value="100" />
+            <enum name="February" value="101" />
+            <enum name="March" value="102" />
+            <enum name="April" value="103" />
+            <enum name="May" value="104" />
+            <enum name="June" value="105" />
+            <enum name="July" value="106" />
+            <enum name="August" value="107" />
+            <enum name="September" value="108" />
+            <enum name="October" value="109" />
+            <enum name="November" value="110" />
+            <enum name="December" value="111" />
+        </attr>
+
+        <attr name="calendarPageOffset" format="integer" />
         <attr name="disableHolidaysAndWeekends" format="boolean" />
         <attr name="extraLayout" format="reference" />
-        <attr name="disableEventList" format="boolean"/>
+        <attr name="disableEventList" format="boolean" />
 
-        <attr name="eventListDividerColor" format="color"/>
-        <attr name="eventListDividerHeight" format="dimension"/>
-        <attr name="daySelectionColor" format="color"/>
-        <attr name="dayUnreadIcon" format="reference"/>
-        <attr name="rememberLastSelectedDay" format="boolean"/>
+        <attr name="eventListDividerColor" format="color" />
+        <attr name="eventListDividerHeight" format="dimension" />
+        <attr name="daySelectionColor" format="color" />
+        <attr name="dayUnreadIcon" format="reference" />
+        <attr name="rememberLastSelectedDay" format="boolean" />
+
+        <attr name="previousMonthNumber" format="integer" />
+        <attr name="nextMonthNumber" format="integer" />
 
     </declare-styleable>
 </resources>

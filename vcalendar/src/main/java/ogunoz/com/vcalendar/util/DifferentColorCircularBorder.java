@@ -42,7 +42,7 @@ public class DifferentColorCircularBorder {
         portion.setProgress(0);
     }
 
-    public void showBorderPortions(final int eventNum, final RelativeLayout parentLayout) {
+    public void showBorderPortions(final int eventNum, final RelativeLayout parentLayout, final int duration) {
 
         if (progressListMap.get(parentLayout).get(1).size() > 0) {
             final ProgressBar portion = progressListMap.get(parentLayout).get(1).get(0);
@@ -54,7 +54,7 @@ public class DifferentColorCircularBorder {
                     portion.setProgress(val);
                 }
             });
-            anim.setDuration(300 / eventNum);
+            anim.setDuration(duration / eventNum);
             anim.start();
             anim.setInterpolator(new LinearInterpolator());
             anim.addListener(new Animator.AnimatorListener() {
@@ -67,7 +67,7 @@ public class DifferentColorCircularBorder {
 
                     if (progressListMap.get(parentLayout).get(1).size() > 0) {
                         progressListMap.get(parentLayout).get(1).remove(0);
-                        showBorderPortions(eventNum, parentLayout);
+                        showBorderPortions(eventNum, parentLayout, duration);
                     }
                 }
 

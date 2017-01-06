@@ -8,6 +8,9 @@
     <integer name="italian">13</integer>
     <integer name="russian">14</integer>
     <integer name="turkish">15</integer>
+    <integer name="firstMonth">100</integer>
+    <integer name="lastMonth">111</integer>
 
-
+    <integer name="animationDuration">500</integer>
+    <integer name="fastAnimationDuration">300</integer>
 </resources>
